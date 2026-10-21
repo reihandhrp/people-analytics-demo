@@ -25,10 +25,11 @@ Every page has a **So what?** card with two or three findings and a recommended 
 ## Written for non-experts
 
 A dashboard is only good if someone who does not work in HR can follow it. So:
-- **A "how to read this page" box** opens every page: what it shows, how to read the charts, why it matters.
+- **A "How to read this page" button** on every page opens two short notes: how to read the charts and why it matters.
 - **Plain words, not jargon.** "Compa-ratio" is shown as *pay level* (100% = the middle of the pay range), "FTE" as *employees*, "requisition" as *job opening*, "turnaround" as *maintenance shutdown*, and so on. A word list in  swaps specialist terms in every sentence, in English and Bahasa Indonesia, and an automated test fails if a banned term appears on screen.
 - **Each ⓘ tooltip explains first, then gives the formula.**
 - **A glossary** in the sidebar defines 17 terms.
+- **Short by design.** Explanations sit behind a "How to read this page" button, ⓘ tooltips and fold-out sections, so the first screen shows numbers and charts. A text budget in the tests keeps every page under 150 words of prose (260 on Predictive).
 - **The employee-group (segmentation) section** explains what was done, lists the six facts used, labels each group with computed traits (for example "Most likely to resign"), and says how to read the dot chart.
 
 ## Methodology in brief

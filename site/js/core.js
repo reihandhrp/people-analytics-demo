@@ -213,6 +213,11 @@ const SHORT = {
   auc: ['A score from 0.5 (no better than a coin flip) to 1.0 (perfect) for how well the model separates people who resigned from people who stayed.', 'Skor dari 0,5 (tak lebih baik dari tebak acak) sampai 1,0 (sempurna) untuk seberapa baik model membedakan yang resign dari yang bertahan.'],
   segments: ['The computer grouped employees with similar profiles into four groups. The names and advice are written by us.', 'Komputer mengelompokkan karyawan berprofil mirip menjadi empat kelompok. Nama dan sarannya kami tulis sendiri.'],
 };
+SHORT.bridge[0] += ' Read it left to right: cost a year ago, plus more people, plus higher cost per person, equals cost now.'; SHORT.bridge[1] += ' Baca dari kiri ke kanan: biaya setahun lalu, ditambah orang bertambah, ditambah biaya per orang naik, sama dengan biaya sekarang.';
+SHORT.funnel[0] += ' Each bar shows how many remain at that step.'; SHORT.funnel[1] += ' Tiap batang menunjukkan berapa yang tersisa di tahap itu.';
+SHORT.nineBox[0] += ' Left to right is performance, bottom to top is potential.'; SHORT.nineBox[1] += ' Kiri ke kanan adalah kinerja, bawah ke atas adalah potensi.';
+SHORT.whatHow[0] += ' Left to right is goal results, bottom to top is behavior.'; SHORT.whatHow[1] += ' Kiri ke kanan adalah hasil target, bawah ke atas adalah perilaku.';
+SHORT.forecast[0] += ' Solid line = what happened, dashed = forecast.'; SHORT.forecast[1] += ' Garis penuh = yang terjadi, putus-putus = perkiraan.';
 DEF.auc = ['AUC: the chance that a randomly chosen person who resigned received a higher risk score than a randomly chosen person who stayed. Measured on a year the model had not seen.', 'AUC: peluang bahwa orang yang resign dipilih acak memperoleh skor risiko lebih tinggi daripada orang yang bertahan. Diukur pada tahun yang belum pernah dilihat model.'];
 const GLOSS = [
   ['Headcount', 'Headcount', 'The number of people employed on a given date.', 'Jumlah orang yang bekerja pada tanggal tertentu.'],
@@ -349,7 +354,7 @@ function hero(label, valueHtml, pillHtml, sideLabel, sideVal, def) {
 const lead = (heroHtml, stats) => `<section class="lead" aria-label="${esc(tt('Key figures', 'Angka utama'))}">${heroHtml}<div class="strip fade" style="--i:1">${stats.join('')}</div></section>`;
 function sowhat(items) {
   const cols = ['var(--purple)', 'var(--orange)', 'var(--navy)'];
-  return `<section class="sowhat fade" style="--i:2" aria-label="So what"><h2>${tt('So what?', 'Jadi, apa artinya?')}</h2><p class="sw-sub">${tt('What the numbers mean and what to do about it. Recalculated for the filters you choose.', 'Arti angka-angka ini dan apa yang perlu dilakukan. Dihitung ulang sesuai filter yang Anda pilih.')}</p><div class="sw-list">${items.filter(Boolean).slice(0, 3).map((x, i) =>
+  return `<section class="sowhat fade" style="--i:2" aria-label="So what"><h2>${tt('So what?', 'Jadi, apa artinya?')}</h2><div class="sw-list">${items.filter(Boolean).slice(0, 3).map((x, i) =>
     `<div class="sw-item"><span class="dot" style="background:${cols[i]}"></span><div><p>${x[0]}</p><p class="sw-act"><b>${tt('Action', 'Aksi')}:</b> ${x[1]}</p></div></div>`).join('')}</div></section>`;
 }
 const filtersNote = (msg) => `<p class="note fade" style="--i:3">${msg}</p>`;
@@ -409,7 +414,9 @@ function lineChart(o) {
     });
   });
   (o.dots || []).forEach((d) => { if (d.v != null) g += `<circle class="area" cx="${x(d.i).toFixed(1)}" cy="${y(d.v).toFixed(1)}" r="4.5" fill="${d.color}" stroke="#fff" stroke-width="2"/>`; });
+  const dense = rot && step < 11;          // too narrow even when rotated: label quarters only, keep every point
   lblTxt.forEach((t, i) => {
+    if (dense && i > 0 && !/-(01|04|07|10)$/.test(o.labels[i])) return;
     g += rot ? `<text x="${x(i).toFixed(1)}" y="${Y1 + 8}" font-size="11" fill="#5B6170" text-anchor="end" transform="rotate(-90 ${x(i).toFixed(1)} ${Y1 + 8})" dominant-baseline="middle">${esc(t)}</text>`
       : `<text x="${x(i).toFixed(1)}" y="${Y1 + 18}" font-size="12" fill="#5B6170" text-anchor="middle">${esc(t)}</text>`;
   });

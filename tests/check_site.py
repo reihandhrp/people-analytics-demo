@@ -71,6 +71,34 @@ async def plain_language(b):
     await pg.close()
 
 
+async def density(b):
+    """Text budget: readers should see charts, not paragraphs. Fails if a page grows wordy again."""
+    pg = await b.new_page(viewport={"width": 1440, "height": 900})
+    await pg.add_init_script("localStorage.removeItem('demo-guide')")
+    over = []
+    for k in PAGES:
+        await pg.goto(f"{URL}#page={k}&lang=en")
+        await pg.wait_for_selector(".page .hero", timeout=20000)
+        await pg.wait_for_timeout(500)
+        r = await pg.evaluate("""() => { const w = t => (t.trim().match(/\\S+/g) || []).length; const c = document.querySelector('#content');
+            let prose = 0; c.querySelectorAll('p,.note,.sw-item,li,.tagline,.act,dd').forEach(el => { if (el.closest('details:not([open])') || el.querySelector('p,li')) return;
+              const n = w(el.innerText); if (n >= 12) prose += n; });
+            const it = [...document.querySelectorAll('.sw-item')].map(e => { const p = e.querySelectorAll('p'); return [w(p[0].innerText), w(p[1].innerText)]; });
+            return { prose, f: Math.max(...it.map(x => x[0])), a: Math.max(...it.map(x => x[1])), sub: Math.max(0, ...[...document.querySelectorAll('.card-head .note')].map(e => w(e.innerText))),
+                     page: w(document.querySelector('#page-sub').innerText), guide: !!document.querySelector('details.guide[open]') } }""")
+        budget = 260 if k == "predictive" else 150
+        why = []
+        if r["prose"] > budget: why.append(f"prose {r['prose']}>{budget}")
+        if r["f"] > 28: why.append(f"finding {r['f']}>28")
+        if r["a"] > 22: why.append(f"action {r['a']}>22")
+        if r["sub"] > 14: why.append(f"card subtitle {r['sub']}>14")
+        if r["page"] > 14: why.append(f"page subtitle {r['page']}>14")
+        if r["guide"]: why.append("how-to-read panel is open by default")
+        if why: over.append(f"{k}: {', '.join(why)}")
+    check(not over, f"text budget on all 12 pages (prose <=150 words, <=260 on Predictive; insights short; guide closed) {over[:3]}")
+    await pg.close()
+
+
 async def interactions(b):
     pg = await b.new_page(viewport={"width": 1366, "height": 900})
     await pg.goto(URL)
@@ -132,6 +160,7 @@ async def main():
         await pages(b, 390, "en", True)
         await pages(b, 360, "id", True)
         await plain_language(b)
+        await density(b)
         await interactions(b)
         if "--no-perf" not in sys.argv:
             await load_time(b)

@@ -17,33 +17,70 @@ const GROUPS = [
   { key: 'tm', icon: IC.tm, label: ['Talent Management', 'Talent Management'], pages: ['performance', 'development'] },
   { key: 'predictive', icon: IC.predictive, label: ['Predictive Insights', 'Insight Prediktif'], pages: ['predictive'] },
 ];
+const GUIDE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
 const PAGES = {
   overview: { nav: ['Executive Overview', 'Ringkasan Eksekutif'], fn: () => pgOverview(), period: true, filters: true,
-    sub: () => tt(`How Demo Corp's workforce, productivity and people cost are tracking, ${periodName()}`, `Kondisi tenaga kerja, produktivitas, dan biaya karyawan Demo Corp, ${periodName()}`) },
+    sub: () => tt(`A health check of the company: how many people work here, what each person produces, what people cost and how many leave (${periodName()})`, `Pemeriksaan kesehatan perusahaan: berapa orang bekerja, apa yang dihasilkan tiap orang, berapa biaya karyawan, dan berapa yang keluar (${periodName()})`),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('A one-page summary for leaders: the number of employees, how much business each person brings in, what employees cost, and how many people leave.', 'Ringkasan satu halaman untuk pimpinan: jumlah karyawan, seberapa besar bisnis yang dihasilkan tiap orang, biaya karyawan, dan berapa yang keluar.')],
+      [tt('How to read it', 'Cara membacanya'), tt('The dark box is the headline number; the white boxes next to it support it. Orange means "keep an eye on this", green means "on or better than target".', 'Kotak gelap adalah angka utama; kotak putih di sebelahnya pendukungnya. Oranye berarti "perlu diperhatikan", hijau berarti "sesuai atau lebih baik dari target".')],
+      [tt('Where to start', 'Mulai dari mana'), tt('Read the "So what?" box: it says in plain words what the numbers mean and what to do. Then use the filters to look at one department or location.', 'Baca kotak "Jadi, apa artinya?": isinya arti angka dalam bahasa biasa beserta saran tindakan. Lalu pakai filter untuk melihat satu department atau lokasi.')]] },
   headcount: { nav: ['Headcount & Department', 'Headcount & Department'], fn: () => pgHeadcount(), period: false, filters: true,
-    sub: () => tt('Who works here today, by department, band, type and tenure', 'Siapa yang bekerja hari ini, per department, band, status, dan masa kerja') },
+    sub: () => tt('Who works here today: by department, job level, contract type and years at the company', 'Siapa yang bekerja hari ini: per department, level jabatan, jenis kontrak, dan lama bekerja'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('A snapshot of everyone employed today, split by department, job level, permanent or contract status, and years at the company.', 'Potret semua karyawan hari ini, dibagi per department, level jabatan, status tetap atau kontrak, dan lama bekerja.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Longer bars or taller columns mean more people. In the monthly chart, navy is permanent staff and orange is staff on a fixed-term contract.', 'Batang lebih panjang atau kolom lebih tinggi berarti lebih banyak orang. Pada grafik bulanan, biru tua adalah karyawan tetap dan oranye karyawan kontrak.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('Many new joiners or contract workers means more hiring and training effort. Many long-serving staff means experience, but also knowledge that leaves with them.', 'Banyak karyawan baru atau kontrak berarti lebih banyak upaya rekrutmen dan pelatihan. Banyak karyawan lama berarti pengalaman, tetapi juga pengetahuan yang ikut pergi saat mereka keluar.')]] },
   attrition: { nav: ['Attrition', 'Attrition'], fn: () => pgAttrition(), period: true, filters: true, needY: true,
-    sub: () => tt('Who leaves, when, why and from which groups', 'Siapa yang keluar, kapan, mengapa, dan dari kelompok mana') },
+    sub: () => tt('People leaving the company: how many, who, when and why', 'Karyawan yang keluar dari perusahaan: berapa banyak, siapa, kapan, dan mengapa'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('How many people leave, who they are, when they leave and why. Turnover (also called attrition) is the number of people who left divided by the average number of employees.', 'Berapa banyak orang keluar, siapa mereka, kapan, dan mengapa. Turnover (disebut juga attrition) adalah jumlah yang keluar dibagi rata-rata jumlah karyawan.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Lower is better. The trend line shows turnover over the previous 12 months, so one unusual month does not distort it. "Resignation" is leaving by choice, "Termination" is a company decision, "End of contract" is a fixed-term contract not renewed.', 'Makin rendah makin baik. Garis tren menunjukkan turnover 12 bulan sebelumnya, sehingga satu bulan yang ganjil tidak mengganggu. "Resign" adalah keluar atas pilihan sendiri, "PHK" keputusan perusahaan, "Kontrak berakhir" kontrak waktu tertentu yang tidak diperpanjang.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('Every person who leaves costs money to replace: hiring, training and lost output. Top performers leaving, and people leaving in their first year, are the costliest.', 'Setiap karyawan yang keluar menimbulkan biaya pengganti: rekrutmen, pelatihan, dan hilangnya output. Karyawan unggul yang keluar, dan yang keluar di tahun pertama, paling mahal.')]] },
   inout: { nav: ['In / Out', 'Masuk & Keluar'], fn: () => pgInOut(), period: true, filters: true,
-    sub: () => tt('Joiners and leavers month by month, with anonymous IDs', 'Karyawan masuk dan keluar per bulan, dengan ID anonim') },
+    sub: () => tt('Everyone who joined and left, month by month, with anonymous IDs', 'Semua yang masuk dan keluar, bulan demi bulan, dengan ID anonim'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('Everyone who joined or left, month by month, so you can see whether the team is growing or shrinking.', 'Semua yang masuk atau keluar, bulan demi bulan, supaya terlihat apakah tim bertambah atau berkurang.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Purple above the line = people who joined. Orange and navy below the line = people who left. Click a month in the table to see who joined or left in that month.', 'Ungu di atas garis = yang masuk. Oranye dan biru tua di bawah garis = yang keluar. Klik satu bulan di tabel untuk melihat siapa yang masuk atau keluar pada bulan itu.')],
+      [tt('Good to know', 'Perlu diketahui'), tt('"Scheduled" = already gave notice but still working. "Starting" = accepted a job offer but has not started yet. Names are fake IDs such as E-0001.', '"Terjadwal" = sudah mengajukan resign tetapi masih bekerja. "Akan masuk" = sudah menerima penawaran tetapi belum mulai. Nama adalah ID fiktif seperti E-0001.')]] },
   productivity: { nav: ['Productivity', 'Produktivitas'], fn: () => pgProductivity(), period: true, filters: false,
-    sub: () => tt('Output and value per employee against the plan targets', 'Output dan nilai per karyawan terhadap target rencana') },
+    sub: () => tt('How much each employee produces and earns for the company, compared with the plan', 'Seberapa banyak yang dihasilkan dan dihasilkan untuk perusahaan oleh tiap karyawan, dibanding rencana'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('How much business each employee generates: sales and operating profit per employee, and tonnes of product made per employee.', 'Seberapa besar bisnis yang dihasilkan tiap karyawan: penjualan dan laba operasional per karyawan, serta ton produk per karyawan.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Columns are actual results; the dashed line is the plan target, so reaching or passing the line is good. Orange columns in the monthly chart are maintenance shutdowns, when a plant stops for planned repairs.', 'Kolom adalah hasil aktual; garis putus adalah target rencana, jadi mencapai atau melewati garis itu baik. Kolom oranye pada grafik bulanan adalah shutdown perawatan, saat pabrik berhenti untuk perbaikan terencana.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('It shows whether we get more output from the same people. Prices also move sales, so tonnes per employee gives the fairer picture.', 'Menunjukkan apakah kita mendapat output lebih banyak dari orang yang sama. Harga juga memengaruhi penjualan, jadi ton per karyawan memberi gambaran yang lebih adil.')]] },
   cost: { nav: ['Manpower Cost', 'Manpower Cost'], fn: () => pgCost(), period: true, filters: true,
-    sub: () => tt('People cost by month, type and department', 'Biaya karyawan per bulan, jenis, dan department') },
+    sub: () => tt('What the company spends on its employees: salary, bonus, benefits, overtime and training', 'Berapa yang dikeluarkan perusahaan untuk karyawan: gaji, bonus, tunjangan, lembur, dan pelatihan'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('Manpower cost is everything the company spends on its employees: salary, bonus, benefits, overtime, training and other costs.', 'Manpower cost adalah semua yang dikeluarkan perusahaan untuk karyawan: gaji, bonus, tunjangan, lembur, pelatihan, dan biaya lain.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Each column is one month, split by type of cost. The tall column every March is the yearly bonus. "Growth by cost type" shows which cost line grew fastest.', 'Tiap kolom adalah satu bulan, dibagi per jenis biaya. Kolom tinggi tiap Maret adalah bonus tahunan. "Pertumbuhan per jenis biaya" menunjukkan pos biaya yang tumbuh paling cepat.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('People cost is one of the largest costs a company can influence. Watch overtime: it rises during plant shutdowns.', 'Biaya karyawan adalah salah satu biaya terbesar yang bisa dikendalikan perusahaan. Perhatikan lembur: naik saat pabrik shutdown.')]] },
   ratios: { nav: ['Cost Ratios', 'Rasio Biaya'], fn: () => pgRatios(), period: true, filters: true,
-    sub: () => tt('People cost relative to revenue, EBITDA and FTE', 'Biaya karyawan relatif terhadap revenue, EBITDA, dan FTE') },
+    sub: () => tt('Is people cost reasonable for the size of the business? Compared with sales, profit and number of employees', 'Apakah biaya karyawan wajar untuk ukuran bisnisnya? Dibandingkan dengan penjualan, laba, dan jumlah karyawan'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('Is people cost reasonable for the size of the business? We compare it with sales, profit and the number of employees.', 'Apakah biaya karyawan wajar untuk ukuran bisnis? Kami membandingkannya dengan penjualan, laba, dan jumlah karyawan.')],
+      [tt('How to read it', 'Cara membacanya'), tt('"Manpower cost % revenue" means: out of every $100 of sales, how many dollars go to employees. Lower usually means people are used more efficiently, but too low can mean underpaying.', '"Manpower cost % revenue" artinya: dari setiap $100 penjualan, berapa dolar untuk karyawan. Lebih rendah biasanya berarti karyawan dimanfaatkan lebih efisien, tetapi terlalu rendah bisa berarti gaji kurang.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('If people cost grows faster than sales, profit gets squeezed.', 'Bila biaya karyawan tumbuh lebih cepat dari penjualan, laba tergerus.')]] },
   analysis: { nav: ['Cost Analysis', 'Analisis Biaya'], fn: () => pgAnalysis(), period: true, filters: true,
-    sub: () => tt('What drove the change in people cost, and how it compares with budget', 'Apa yang mendorong perubahan biaya karyawan, dan bagaimana dibanding budget') },
+    sub: () => tt('Why did people cost change, and are we on budget?', 'Mengapa biaya karyawan berubah, dan apakah sesuai budget?'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('It explains why people cost changed compared with a year ago, and whether spending is on budget.', 'Menjelaskan mengapa biaya karyawan berubah dibanding setahun lalu, dan apakah pengeluaran sesuai budget.')],
+      [tt('How to read it', 'Cara membacanya'), tt('The first chart starts with last year\'s cost, adds the cost of having more people, adds the cost of paying each person more, and ends at today\'s cost. In the budget chart, the bar is actual spending and the black line is the budget.', 'Grafik pertama dimulai dari biaya tahun lalu, menambah biaya karena orang bertambah, menambah biaya karena tiap orang dibayar lebih, dan berakhir di biaya sekarang. Pada grafik budget, batang adalah pengeluaran aktual dan garis hitam adalah budget.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('If the rise comes from more people, the lever is hiring. If it comes from higher cost per person, the lever is pay and overtime policy.', 'Jika kenaikan berasal dari jumlah orang, pengungkitnya adalah rekrutmen. Jika dari biaya per orang, pengungkitnya adalah kebijakan gaji dan lembur.')]] },
   ta: { nav: ['Talent Acquisition', 'Talent Acquisition'], fn: () => pgTA(), period: true, filters: true, needY: true,
-    sub: () => tt('How fast, how well and at what cost roles are filled', 'Seberapa cepat, seberapa baik, dan berapa biaya mengisi posisi') },
+    sub: () => tt('Hiring: how fast, at what cost, from which sources, and how good the new hires turn out', 'Rekrutmen: seberapa cepat, berapa biaya, dari sumber mana, dan seberapa baik karyawan barunya'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('How well the company hires: how fast, at what cost, from which sources, and how good the new hires turn out.', 'Seberapa baik perusahaan merekrut: seberapa cepat, berapa biaya, dari sumber mana, dan seberapa baik karyawan barunya.')],
+      [tt('How to read it', 'Cara membacanya'), tt('The funnel shows how many people drop out at each step. "Days to fill a job" counts from the day a job opens to the day an offer is accepted. Fewer days and lower cost are better.', 'Funnel menunjukkan berapa orang gugur di tiap tahap. "Lama mengisi lowongan" dihitung dari lowongan dibuka sampai penawaran diterima. Makin singkat dan murah makin baik.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('Empty jobs mean lost output and overworked teams. Knowing which sources bring the best employees shows where to spend the recruiting budget.', 'Lowongan kosong berarti hilangnya output dan tim yang kelelahan. Mengetahui sumber mana yang menghasilkan karyawan terbaik menunjukkan ke mana anggaran rekrutmen sebaiknya dipakai.')]] },
   performance: { nav: ['Performance', 'Kinerja'], fn: () => pgPerformance(), period: true, filters: true, needY: true,
-    sub: () => tt(`KPI-based and behavior-based results, review cycle ${DB.CYCLE}`, `Hasil berbasis KPI dan perilaku, siklus penilaian ${DB.CYCLE}`) },
+    sub: () => tt(`How employees performed in the ${DB.CYCLE} yearly review: results on goals (KPI) and on behavior`, `Kinerja karyawan pada penilaian tahunan ${DB.CYCLE}: hasil target (KPI) dan perilaku`),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('How employees did in the latest yearly review. The final rating (1 to 5) mixes results on goals (70%) with behavior such as safety, teamwork and integrity (30%).', 'Bagaimana kinerja karyawan pada penilaian tahunan terbaru. Rating akhir (1 sampai 5) menggabungkan hasil target (70%) dengan perilaku seperti keselamatan, kerja sama, dan integritas (30%).')],
+      [tt('How to read it', 'Cara membacanya'), tt('5 = outstanding, 3 = meets expectations, 1 = unsatisfactory. The two grids place each person by what they achieved, how they behaved, and how far they could grow.', '5 = istimewa, 3 = sesuai harapan, 1 = tidak memuaskan. Dua matriks menempatkan tiap orang berdasarkan apa yang dicapai, bagaimana perilakunya, dan seberapa jauh bisa berkembang.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('Rewarding results and good behavior together builds the right culture. The grids show who to develop, who to coach and who to watch.', 'Menghargai hasil sekaligus perilaku yang baik membangun budaya yang tepat. Matriks menunjukkan siapa yang dikembangkan, di-coach, atau perlu diperhatikan.')]] },
   development: { nav: ['Development', 'Pengembangan'], fn: () => pgDevelopment(), period: true, filters: true,
-    sub: () => tt('Training, internal mobility and succession', 'Pelatihan, mobilitas internal, dan suksesi') },
+    sub: () => tt('How the company grows its people: training, filling jobs from within, and backups for key roles', 'Bagaimana perusahaan mengembangkan karyawan: pelatihan, mengisi lowongan dari dalam, dan pengganti untuk posisi kunci'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('How the company grows its people: training, filling jobs with its own employees, and having backups ready for key roles.', 'Bagaimana perusahaan mengembangkan karyawannya: pelatihan, mengisi lowongan dengan karyawan sendiri, dan menyiapkan pengganti untuk posisi kunci.')],
+      [tt('How to read it', 'Cara membacanya'), tt('The backup chart shows, for each key role (senior managers and plant leaders), whether someone could step in now, within 1–2 years, or nobody is lined up.', 'Grafik pengganti menunjukkan, untuk tiap posisi kunci (manajer senior dan pimpinan pabrik), apakah ada yang bisa menggantikan sekarang, dalam 1–2 tahun, atau belum ada.')],
+      [tt('Why it matters', 'Mengapa penting'), tt('Training and internal moves keep people engaged. A key role with no backup is a business risk if that person leaves.', 'Pelatihan dan perpindahan internal menjaga keterlibatan karyawan. Posisi kunci tanpa pengganti adalah risiko bisnis bila pemegangnya keluar.')]] },
   predictive: { nav: ['Predictive Insights', 'Insight Prediktif'], fn: () => pgPredictive(), period: false, filters: true,
-    sub: () => tt('Forecast, attrition risk and employee segments', 'Forecast, risiko attrition, dan segmen karyawan') },
+    sub: () => tt('Three simple models: a 12-month forecast, who might resign, and groups of similar employees', 'Tiga model sederhana: forecast 12 bulan, siapa yang mungkin resign, dan kelompok karyawan yang mirip'),
+    guide: () => [[tt('What this page is', 'Halaman ini tentang apa'), tt('Three simple statistical models trained on the demo data: a forecast of the next 12 months, an estimate of who might resign, and groups of similar employees. They are illustrations, not crystal balls.', 'Tiga model statistik sederhana yang dilatih pada data demo: forecast 12 bulan ke depan, perkiraan siapa yang mungkin resign, dan kelompok karyawan yang mirip. Ini ilustrasi, bukan ramalan pasti.')],
+      [tt('How to read it', 'Cara membacanya'), tt('Forecast: solid line = what happened, dashed = forecast, shaded = likely range. Risk of resigning: the share of people rated low, medium or high risk. Employee groups: each dot is one employee.', 'Forecast: garis penuh = yang terjadi, putus-putus = perkiraan, arsir = rentang yang mungkin. Risiko resign: porsi orang yang dinilai berisiko rendah, sedang, atau tinggi. Kelompok karyawan: tiap titik adalah satu karyawan.')],
+      [tt('Use with care', 'Gunakan dengan hati-hati'), tt('Models find patterns across groups of people. Use them to start conversations, never to judge one individual.', 'Model menemukan pola pada kelompok orang. Gunakan untuk memulai percakapan, bukan untuk menilai satu individu.')]] },
 };
-const FILTERS = [['dept', ['Department', 'Department']], ['loc', ['Location', 'Lokasi']], ['etype', ['Employment type', 'Status kerja']], ['band', ['Job band', 'Job band']], ['gender', ['Gender', 'Gender']]];
+const FILTERS = [['dept', ['Department', 'Department']], ['loc', ['Location', 'Lokasi']], ['etype', ['Employment type', 'Status kerja']], ['band', ['Job level', 'Level jabatan']], ['gender', ['Gender', 'Gender']]];
 const L = (pair) => pair[S.lang === 'id' ? 1 : 0];
 
 // ------------------------------------------------------------------ routing (hash = page&lang&period)
@@ -83,10 +120,11 @@ function renderChrome() {
   renderFoot();
   void grp;
 }
+const periodLabel2 = (k) => (k === 'ytd' ? tt(DB.LAST.slice(0, 4) + ' so far', DB.LAST.slice(0, 4) + ' sejauh ini') : tt('Full year ' + DB.LAST_FY, 'Tahun penuh ' + DB.LAST_FY));
 function renderPeriod(pg) {
   const el = $('period'); el.hidden = !pg.period; document.querySelector('.tb-div').hidden = !pg.period;
   if (!DB.meta) return;
-  const opts = [['ttm', tt('Last 12 months', '12 bulan terakhir'), periodRange(periodMonths('ttm'))], ['ytd', 'YTD ' + DB.LAST.slice(0, 4), periodRange(periodMonths('ytd'))], ['fy', 'FY' + DB.LAST_FY, periodRange(periodMonths('fy'))]];
+  const opts = [['ttm', tt('Last 12 months', '12 bulan terakhir'), periodRange(periodMonths('ttm'))], ['ytd', periodLabel2('ytd'), periodRange(periodMonths('ytd'))], ['fy', periodLabel2('fy'), periodRange(periodMonths('fy'))]];
   el.innerHTML = `<span class="scope-label" id="period-lbl">${tt('Period', 'Periode')}</span><div class="scope-seg" role="group" aria-labelledby="period-lbl">${opts.map((o) => `<button type="button" data-period="${o[0]}" aria-pressed="${S.period === o[0]}" title="${esc(o[2])}">${esc(o[1])}</button>`).join('')}</div>`;
 }
 function renderFilters(pg) {
@@ -102,16 +140,26 @@ function renderFilters(pg) {
 function renderFoot() {
   if (!DB.meta) return;
   const repo = window.REPO_URL && window.REPO_URL.indexOf('__') !== 0 ? window.REPO_URL : null;
-  $('side-foot').innerHTML = `<span>${tt('Portfolio demo. All people, figures and the company are fictional.', 'Demo portofolio. Semua orang, angka, dan perusahaannya fiktif.')}</span>${repo ? `<a href="${esc(repo)}" target="_blank" rel="noopener">${tt('Source code & methodology', 'Kode & metodologi')}</a>` : ''}`;
-  $('defs-sum').textContent = tt('About this demo', 'Tentang demo ini');
-  $('defs-body').innerHTML = `<div><p><b>Demo Corp</b> ${tt('is a fictional polyolefin producer (polyethylene and polypropylene) with a corporate HQ and three plants. Every employee, requisition and dollar on this site is synthetic, produced by a seeded Python script, and the data refreshes so that dates stay relative to today.', 'adalah produsen poliolefin fiktif (polietilena dan polipropilena) dengan kantor pusat dan tiga pabrik. Setiap karyawan, requisition, dan dolar di situs ini sintetis, dibuat oleh script Python dengan seed tetap, dan datanya diperbarui sehingga tanggalnya selalu relatif terhadap hari ini.')}</p>
-    <p>${tt('People data runs to ', 'Data karyawan s.d. ')}<b>${fmtDate(DB.AS_OF)}</b>${tt('; finance, cost and production to ', '; keuangan, biaya, dan produksi s.d. ')}<b>${ymFull(DB.LAST)}</b>. ${tt('Seed ', 'Seed ')}${DB.meta.seed}.</p></div>
-    <div><p>${tt('Each metric has an ⓘ button with its formula. Insight text is computed from the data and the filters you choose. The three predictive models are illustrative and trained on the synthetic data only.', 'Setiap metrik punya tombol ⓘ berisi formulanya. Teks insight dihitung dari data dan filter yang Anda pilih. Ketiga model prediktif bersifat ilustratif dan hanya dilatih pada data sintetis.')}</p>
+  $('side-foot').innerHTML = `<span>${tt('Portfolio demo. All people, figures and the company are fictional.', 'Demo portofolio. Semua orang, angka, dan perusahaannya fiktif.')}</span><button type="button" class="linklike" data-act="gloss">${tt('Plain-language glossary', 'Glosarium istilah')}</button>${repo ? `<a href="${esc(repo)}" target="_blank" rel="noopener">${tt('Source code & methodology', 'Kode & metodologi')}</a>` : ''}`;
+  $('defs-sum').textContent = tt('About this demo and glossary', 'Tentang demo ini dan glosarium');
+  $('defs-body').innerHTML = `<div><p><b>Demo Corp</b> ${tt('is a fictional polyolefin producer (polyethylene and polypropylene) with a corporate HQ and three plants. Every employee, job opening and dollar on this site is synthetic: produced by a seeded Python script and refreshed daily so dates stay relative to today.', 'adalah produsen poliolefin fiktif (polietilena dan polipropilena) dengan kantor pusat dan tiga pabrik. Setiap karyawan, lowongan, dan dolar di situs ini sintetis: dibuat oleh script Python dengan seed tetap dan diperbarui setiap hari sehingga tanggalnya selalu relatif terhadap hari ini.')}</p>
+    <p>${tt('People data runs to ', 'Data karyawan s.d. ')}<b>${fmtDate(DB.AS_OF)}</b>${tt('; finance, cost and production to ', '; keuangan, biaya, dan produksi s.d. ')}<b>${ymFull(DB.LAST)}</b>.</p></div>
+    <div><p>${tt('Each page starts with a short guide on how to read it. The ⓘ button next to a metric explains it in plain words and then gives the formula. The "So what?" text is calculated from the data and from the filters you choose. The three predictive models are illustrative and use only the synthetic data.', 'Setiap halaman diawali panduan singkat cara membacanya. Tombol ⓘ di samping metrik menjelaskan artinya dalam bahasa biasa, lalu rumusnya. Teks "Jadi, apa artinya?" dihitung dari data dan filter yang Anda pilih. Ketiga model prediktif bersifat ilustratif dan hanya memakai data sintetis.')}</p>
     ${repo ? `<p><a href="${esc(repo)}" target="_blank" rel="noopener">${tt('Repository, data generator and methodology', 'Repositori, generator data, dan metodologi')}</a></p>` : ''}</div>`;
+  let g = $('gloss');
+  if (!g) { g = document.createElement('details'); g.id = 'gloss'; g.className = 'defs'; $('main').appendChild(g); }
+  const wasOpen = g.open;
+  g.innerHTML = `<summary>${tt('Plain-language glossary', 'Glosarium istilah')}</summary><dl class="defs-body glossary">${GLOSS.map((x) => `<div><dt>${esc(S.lang === 'id' ? x[1] : x[0])}</dt><dd>${esc(S.lang === 'id' ? x[3] : x[2])}</dd></div>`).join('')}</dl>`;
+  g.open = wasOpen;
 }
 
 // ------------------------------------------------------------------ render
 let STATUS = 'loading';
+function guideOpen() { if (S.guide == null) { let v = null; try { v = localStorage.getItem('demo-guide'); } catch (e) { /* storage unavailable */ } S.guide = v ? v === '1' : window.innerWidth >= 761; } return S.guide; }
+function guideHtml() {
+  const g = PAGES[S.page].guide; if (!g) return '';
+  return `<details class="guide fade" id="guide"${guideOpen() ? ' open' : ''}><summary>${GUIDE_ICON}${tt('New to HR data? How to read this page', 'Baru mengenal data HR? Cara membaca halaman ini')}</summary><div class="guide-body">${g().map((x) => `<div><h3>${esc(x[0])}</h3><p>${esc(x[1])}</p></div>`).join('')}</div></details>`;
+}
 function countUp(root) {
   if (RM.matches) return;
   const els = Array.from(root.querySelectorAll('.cnt[data-count]')).filter((e) => e.dataset.count !== '');
@@ -132,7 +180,7 @@ function render(play) {
   c.classList.remove('play');
   let html;
   if (PAGES[S.page].filters && anyFilter() && !AG.E.length) html = `<div class="empty" style="min-height:220px;flex-direction:column;gap:10px">${tt('No employees match this filter combination.', 'Tidak ada karyawan untuk kombinasi filter ini.')}<button class="btn" type="button" data-act="reset">${tt('Reset filters', 'Reset filter')}</button></div>`;
-  else { try { html = `<div class="page">${PAGES[S.page].fn()}</div>`; } catch (err) { console.error(err); html = `<div class="err" role="alert">${tt('This view could not be drawn for the current selection. Reset the filters or choose another period.', 'Tampilan ini tidak dapat digambar untuk pilihan sekarang. Reset filter atau pilih periode lain.')}</div>`; } }
+  else { try { html = `<div class="page">${guideHtml()}${PAGES[S.page].fn()}</div>`; } catch (err) { console.error(err); html = `<div class="err" role="alert">${tt('This view could not be drawn for the current selection. Reset the filters or choose another period.', 'Tampilan ini tidak dapat digambar untuk pilihan sekarang. Reset filter atau pilih periode lain.')}</div>`; } }
   c.innerHTML = html;
   if (play) { void c.offsetWidth; c.classList.add('play'); countUp(c); } else window.scrollTo(0, y);
 }
@@ -149,7 +197,8 @@ function bindTips() {
   const place = (cx, cy) => { const w = tip.offsetWidth, h = tip.offsetHeight; let x = cx + 14, y = cy - h - 12; if (x + w > window.innerWidth - 8) x = cx - w - 14; if (x < 8) x = 8; if (y < 8) y = cy + 18; if (y + h > window.innerHeight - 8) y = Math.max(8, window.innerHeight - h - 8); tip.style.left = x + 'px'; tip.style.top = y + 'px'; };
   const showData = (data, cx, cy, key) => { if (key !== lastKey) { tip.className = ''; tip.innerHTML = `<b>${esc(data[0])}</b>` + data[1].map((r) => `<span>${esc(r[0])}</span><em>${esc(r[1])}</em>`).join(''); lastKey = key; } tip.hidden = false; place(cx, cy); };
   const showDef = (btn) => { const d = DEF[btn.dataset.def]; if (!d) return; const lab = btn.closest('.stat,.hero,.card-head,h2'); const title = lab ? (lab.querySelector('.stat-label,.hero-label,h2') || lab).textContent.trim() : '';
-    tip.className = 'def'; tip.innerHTML = `${title ? `<b>${esc(title)}</b>` : ''}<p>${esc(d[S.lang === 'id' ? 1 : 0])}</p>`; lastKey = 'def:' + btn.dataset.def; tip.hidden = false; const r = btn.getBoundingClientRect(); place(r.left + r.width / 2, r.top); };
+    const ix = S.lang === 'id' ? 1 : 0, sh = SHORT[btn.dataset.def];
+    tip.className = 'def'; tip.innerHTML = `${title ? `<b>${esc(title)}</b>` : ''}${sh ? `<p>${esc(plainify(sh[ix]))}</p><p>${esc(tt('How it is calculated: ', 'Cara menghitung: ') + plainify(d[ix]))}</p>` : `<p>${esc(plainify(d[ix]))}</p>`}`; lastKey = 'def:' + btn.dataset.def; tip.hidden = false; const r = btn.getBoundingClientRect(); place(r.left + r.width / 2, r.top); };
   const clearLines = () => document.querySelectorAll('.hv-line,.hv-dot').forEach((el) => el.setAttribute('visibility', 'hidden'));
   const hide = () => { tip.hidden = true; lastKey = null; pinned = null; clearLines(); };
   const line = (svg, e) => {
@@ -195,6 +244,7 @@ function bindUI() {
   const c = $('content');
   c.addEventListener('click', (e) => {
     const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act, v = b.dataset.v;
+    if (a === 'gloss') { const d = $('gloss'); d.open = true; d.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'start' }); return; }
     if (a === 'reset') { Object.keys(S.F).forEach((k) => { S.F[k] = null; }); render(true); return; }
     if (a === 'fcreset') { S.wi = null; render(false); return; }
     if (a === 'month') { S.io.month = S.io.month === v ? 'all' : v; S.io.kind = 'all'; S.pg.io = 0; }
@@ -204,6 +254,8 @@ function bindUI() {
     const nb = c.querySelector(`[data-act="${a}"]${v != null ? `[data-v="${CSS.escape(v)}"]` : ''}`); if (nb && !nb.disabled) nb.focus({ preventScroll: true });
     if (a === 'pg' || a === 'month') { const l = $('io-list'); if (l && l.getBoundingClientRect().top < 0) l.scrollIntoView({ block: 'start' }); }
   });
+  c.addEventListener('toggle', (e) => { if (e.target.id === 'guide') { S.guide = e.target.open; try { localStorage.setItem('demo-guide', S.guide ? '1' : '0'); } catch (x) { /* storage unavailable */ } } }, true);
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-act="gloss"]'); if (b) { e.preventDefault(); const d = $('gloss'); d.open = true; d.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'start' }); } });
   c.addEventListener('input', (e) => {
     if (e.target.id === 'q-io') { S.io.q = e.target.value; S.pg.io = 0; const pos = e.target.selectionStart; render(false); const q = $('q-io'); if (q) { q.focus({ preventScroll: true }); q.setSelectionRange(pos, pos); } return; }
     const k = e.target.dataset && e.target.dataset.sl; if (!k) return;

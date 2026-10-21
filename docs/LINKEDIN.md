@@ -24,7 +24,7 @@ Waktu posting yang umumnya baik adalah Selasa sampai Kamis, pukul 07.30–09.00 
 > • Three illustrative models: a 12-month cost forecast with what-if sliders, attrition risk (logistic regression), and K-Means employee segments
 >
 > Three things I cared about:
-> 1. Every metric shows its formula. No black boxes.
+> 1. Written for non-experts: every page starts with a short "how to read this", jargon is replaced by plain words, and every metric explains itself, then shows its formula. No black boxes.
 > 2. Every page ends with "So what?": findings and an action, recalculated as you filter.
 > 3. Model honesty: AUC ~0.69 is useful for prioritising conversations, not for judging individuals.
 >
@@ -50,7 +50,7 @@ Waktu posting yang umumnya baik adalah Selasa sampai Kamis, pukul 07.30–09.00 
 > • Tiga model ilustratif: forecast biaya 12 bulan dengan slider what-if, risiko attrition (regresi logistik), dan segmentasi K-Means
 >
 > Tiga prinsip yang saya pegang:
-> 1. Setiap metrik menampilkan formulanya.
+> 1. Dibuat untuk orang awam: setiap halaman diawali panduan cara membaca, istilah teknis diganti bahasa biasa, dan tiap metrik menjelaskan dirinya dulu sebelum menampilkan rumusnya.
 > 2. Setiap halaman ditutup dengan "So what?": temuan dan aksi yang dihitung ulang mengikuti filter.
 > 3. Jujur soal model: AUC ~0,69 berguna untuk memprioritaskan percakapan, bukan untuk menilai individu.
 >

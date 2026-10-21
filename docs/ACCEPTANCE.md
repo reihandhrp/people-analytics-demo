@@ -1,6 +1,6 @@
 # Acceptance checklist
 
-Tested on 21 October 2026 with the data as of that day, in headless Chromium.
+Tested on 21 October 2026 (re-run after the plain-language update) with the data as of that day, in headless Chromium.
 To re-run: `python3 generator/validate.py` and `python3 tests/check_site.py` (see the README).
 
 | # | Requirement | How it was checked | Result |
@@ -13,7 +13,7 @@ To re-run: `python3 generator/validate.py` and `python3 tests/check_site.py` (se
 | 6 | Data feels live | Data regenerated daily as of today (07:15 WIB); "Data as of" chip; history stays identical when the date moves forward (verified) | **Pass** |
 | 7 | "Demo, synthetic data" badge | Header chip on every page, sidebar note, Open Graph image, carousel | **Pass** |
 | 8 | Requested navigation | Executive Overview · Workforce (Headcount & Department, Attrition, In/Out) · Productivity & Cost (Productivity, Manpower Cost, Cost Ratios, Cost Analysis) · Talent Acquisition · Talent Management (Performance, Development) · Predictive Insights | **Pass** |
-| 9 | Formula on every metric | ⓘ buttons on headline numbers and chart titles (47 definitions, EN + ID), also in docs/METRICS.md | **Pass** |
+| 9 | Formula on every metric | ⓘ buttons on headline numbers and chart titles (48 definitions, EN + ID, each with a plain-words meaning first), also in docs/METRICS.md | **Pass** |
 | 10 | "So what?" card, 2–3 insights + actions, at most 6–8 visuals per page | Present on all 12 pages; text computed from data and filters | **Pass** |
 | 11 | Data spec | About 1,200 employees, 8 departments, monthly since Jan 2023, USD; revenue growth 8.7–11.3% for every rolling 12 months; manpower cost 7.1–7.8% of revenue (6–10%, the realistic petrochemical range agreed in phase 1); turnover 12.2–14.7% for every rolling 12 months; time-to-fill 37–43 days | **Pass** · 75/75 validation checks |
 | 12 | Planted correlations make the models meaningful | Voluntary exit ×3.4 for compa-ratio < 0.90 vs ≥ 1.00; ×3.8 for > 36 vs < 18 months since promotion; ×1.9 for tenure < 2 vs 5–10 years; ×2.4 for low training | **Pass** |
@@ -21,6 +21,7 @@ To re-run: `python3 generator/validate.py` and `python3 tests/check_site.py` (se
 | 14 | Interactive filters | Department, location, employment type, job band, gender; period (last 12 months / YTD / last FY); language EN/ID; links keep page, period and language | **Pass** · 7/7 interaction checks |
 | 15 | Accessibility basics | Keyboard navigation with visible focus, tooltips on focus, labelled controls, reduced-motion respected, AA contrast on text | **Pass** |
 | 16 | README with purpose, methodology and how to regenerate data | README.md, docs/DATA.md, docs/METRICS.md, docs/VALIDATION.md | **Pass** |
+| 17 | Understandable by non-experts | A how-to-read box on all 12 pages; specialist terms replaced by everyday words in EN and ID; two-layer tooltips (meaning, then formula); glossary of 17 terms; automated test that fails if a banned term (compa-ratio, FTE, EBITDA, requisition, YTD, KPI without explanation, and 20 more) appears on screen | **Pass** · 49/49 end-to-end checks |
 
 **Known limits, stated in the product.**
 - The attrition model ranks current employees. Its "expected resignations" exclude people who have not been hired yet, so it is lower than the total yearly resignations.

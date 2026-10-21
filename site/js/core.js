@@ -4,7 +4,66 @@
 const $ = (id) => document.getElementById(id);
 const S = { lang: 'en', page: 'overview', period: 'ttm', F: { dept: null, loc: null, etype: null, band: null, gender: null },
   io: { month: 'all', kind: 'all', q: '' }, pg: {}, wi: null, CW: 1000 };
-const tt = (en, id) => (S.lang === 'id' ? id : en);
+// Plain-language layer: every visible string passes through tt(), which swaps specialist terms for everyday words.
+const PLAIN_EN = [
+  ['Compa-ratio', 'Pay level'], ['compa-ratio', 'pay level'],
+  ['Headcount effect', 'Effect of more people'], ['headcount effect', 'effect of more people'],
+  ['Rate effect', 'Effect of higher cost per person'], ['rate effect', 'effect of higher cost per person'],
+  ['Cost per FTE', 'Cost per employee'], ['cost per FTE', 'cost per employee'], ['per FTE', 'per employee'], ['more FTE', 'more people'], ['FTE', 'full-time employees'],
+  ['EBITDA / employee', 'Operating profit / employee'], ['EBITDA per employee', 'Operating profit per employee'], ['EBITDA', 'operating profit'],
+  ['Human Capital ROI', 'Return on people cost'],
+  ['Time-to-fill', 'Days to fill a job'], ['time-to-fill', 'days to fill a job'],
+  ['Offer acceptance', 'Job offers accepted'], ['offer acceptance', 'job offers accepted'],
+  ['Cost-per-hire', 'Cost per hire'], ['cost-per-hire', 'cost per hire'],
+  ['Quality of hire', 'New-hire quality'], ['quality of hire', 'new-hire quality'],
+  ['Source effectiveness', 'Where hires come from'],
+  ['Requisition aging', 'How long jobs stay open'], ['Open requisitions', 'Open jobs'], ['Requisitions', 'Job openings'], ['requisitions', 'job openings'], ['Requisition', 'Job opening'], ['requisition', 'job opening'],
+  ['Early attrition', 'Left in the first year'], ['early attrition', 'left in the first year'],
+  ['Regretted', 'Top performers who left'],
+  ['Attrition risk', 'Risk of resigning'], ['attrition risk', 'risk of resigning'], ['attrition model', 'resignation-risk model'],
+  ['What vs How', 'Results vs. Behavior'],
+  ['KPI achievement', 'Goal achievement (KPI)'], ['KPI score', 'Goal score'], ['KPI results', 'Goal results'], ['Cycle', 'Review year'], ['cycle', 'review year'],
+  ['Succession coverage', 'Backup plan for key roles'], ['Succession', 'Backup plan'], ['succession', 'backup plan'], ['successors', 'backups'], ['successor', 'backup person'], ['ready-now', 'ready now'],
+  ['turnarounds', 'maintenance shutdowns'], ['turnaround', 'maintenance shutdown'], ['Turnaround', 'Maintenance shutdown'],
+  ['annualised', 'per year'], ['Annualised', 'Per year'],
+  ['YTD', 'year to date'], ['MTD', 'this month'],
+  ['below band midpoint', 'below the middle of their pay range'], ['band midpoint', 'middle of the pay range'], ['midpoints', 'pay-range middles'], ['midpoint', 'middle of the pay range'],
+  ['Job band', 'Job level'], ['job band', 'job level'],
+  ['Active headcount', 'Active employees'], ['run-rate', 'ongoing level'], ['stay conversations', 'retention talks'], ['calibrate', 'compare and align'],
+  ['Cost bridge', 'What changed the cost'], ['cost bridge', 'breakdown of the cost change'],
+];
+const PLAIN_ID = [
+  ['Compa-ratio', 'Level gaji'], ['compa-ratio', 'level gaji'],
+  ['Efek headcount', 'Efek tambahan orang'], ['efek headcount', 'efek tambahan orang'], ['Efek tarif', 'Efek kenaikan biaya per orang'], ['efek tarif', 'efek kenaikan biaya per orang'],
+  ['Biaya per FTE', 'Biaya per karyawan'], ['biaya per FTE', 'biaya per karyawan'], ['per FTE', 'per karyawan'], ['tambahan FTE', 'tambahan karyawan'], ['FTE', 'karyawan setara penuh waktu'],
+  ['EBITDA / karyawan', 'Laba operasional / karyawan'], ['EBITDA', 'laba operasional'],
+  ['Human Capital ROI', 'Imbal hasil biaya karyawan'],
+  ['Time-to-fill', 'Lama mengisi lowongan'], ['time-to-fill', 'lama mengisi lowongan'],
+  ['Penerimaan offer', 'Penawaran kerja diterima'], ['Offer', 'Penawaran kerja'], ['offer', 'penawaran kerja'],
+  ['Cost-per-hire', 'Biaya per perekrutan'], ['cost-per-hire', 'biaya per perekrutan'],
+  ['Quality of hire', 'Kualitas karyawan baru'], ['quality of hire', 'kualitas karyawan baru'],
+  ['Efektivitas sumber', 'Asal karyawan baru'],
+  ['Umur requisition', 'Lama lowongan terbuka'], ['Requisition terbuka', 'Lowongan terbuka'], ['Requisition', 'Lowongan'], ['requisition', 'lowongan'],
+  ['Early attrition', 'Keluar di tahun pertama'], ['Regretted', 'Karyawan unggul yang keluar'],
+  ['Risiko attrition', 'Risiko resign'], ['risiko attrition', 'risiko resign'], ['model attrition', 'model risiko resign'],
+  ['Apa vs Bagaimana', 'Hasil vs Perilaku'],
+  ['Pencapaian KPI', 'Pencapaian target (KPI)'], ['Skor KPI', 'Skor target'], ['skor KPI', 'skor target'], ['hasil KPI', 'hasil target'],
+  ['siklus penilaian', 'tahun penilaian'], ['Siklus', 'Tahun penilaian'], ['siklus', 'tahun penilaian'],
+  ['Suksesi', 'Rencana pengganti'], ['suksesi', 'rencana pengganti'], ['penerus', 'orang pengganti'],
+  ['turnaround', 'shutdown perawatan'], ['Turnaround', 'Shutdown perawatan'],
+  ['YTD', 'sejak awal tahun'], ['MTD', 'bulan ini'],
+  ['di bawah midpoint band', 'di bawah titik tengah rentang gajinya'], ['midpoint band', 'titik tengah rentang gaji'], ['di bawah band midpoint', 'di bawah titik tengah rentang gajinya'], ['band midpoint', 'titik tengah rentang gaji'], ['midpoint', 'titik tengah rentang gaji'], ['Job band', 'Level jabatan'], ['job band', 'level jabatan'],
+  ['Headcount aktif', 'Karyawan aktif'], ['run-rate', 'tingkat berjalan'], ['stay interview', 'obrolan retensi'], ['kalibrasi', 'penyelarasan'],
+  ['Jembatan biaya', 'Apa yang mengubah biaya'], ['jembatan biaya', 'rincian perubahan biaya'],
+];
+function plainRx(list) {
+  const map = {}; list.forEach((x) => { map[x[0]] = x[1]; });
+  const keys = Object.keys(map).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return { map, rx: new RegExp('\\b(?:' + keys.join('|') + ')\\b', 'g') };
+}
+const PLAIN = { en: plainRx(PLAIN_EN), id: plainRx(PLAIN_ID) };
+const plainify = (str) => { const p = PLAIN[S.lang === 'id' ? 'id' : 'en']; return typeof str === 'string' ? str.replace(p.rx, (m) => p.map[m]) : str; };
+const tt = (en, id) => plainify(S.lang === 'id' ? id : en);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const LOCALE = () => (S.lang === 'id' ? 'id-ID' : 'en-US');
 const NF = (v, d) => (v == null || !isFinite(v) ? '–' : Number(v).toLocaleString(LOCALE(), { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }));
@@ -55,10 +114,10 @@ const LBL = {
 };
 const lbl = (dim, v) => (S.lang === 'id' && LBL[dim] && LBL[dim][v]) ? LBL[dim][v] : (dim === 'etype' && S.lang === 'en' ? v : v);
 const SEGS = {
-  rising: { en: 'Rising Talent', id: 'Calon Bintang', color: 'var(--purple)' },
-  established: { en: 'Established Core', id: 'Inti Mapan', color: 'var(--navy)' },
-  ramping: { en: 'New & Ramping', id: 'Karyawan Baru', color: 'var(--orange)' },
-  plateaued: { en: 'Plateaued Veterans', id: 'Veteran Stagnan', color: 'var(--sky)' },
+  rising: { en: 'Rising Stars', id: 'Bintang Menanjak', color: 'var(--purple)' },
+  established: { en: 'Experienced Core', id: 'Inti Berpengalaman', color: 'var(--navy)' },
+  ramping: { en: 'New Joiners', id: 'Karyawan Baru', color: 'var(--orange)' },
+  plateaued: { en: 'Long-Serving, Stalled', id: 'Senior Lama, Stagnan', color: 'var(--sky)' },
 };
 const segName = (k) => SEGS[k][S.lang];
 const COST_TYPES = ['base', 'bonus', 'benefits', 'overtime', 'training', 'others'];
@@ -116,6 +175,64 @@ const DEF = {
   risk: ['Logistic regression: probability of resigning within 12 months from tenure, compa-ratio, last final rating, months since promotion and training hours. Tier High ≥ 2 × base rate, Medium ≥ base rate.', 'Regresi logistik: peluang resign dalam 12 bulan dari masa kerja, compa-ratio, rating akhir terakhir, bulan sejak promosi, dan jam pelatihan. Tier Tinggi ≥ 2 × tingkat dasar, Sedang ≥ tingkat dasar.'],
   segments: ['K-Means (k = 4) on standardised tenure, compa-ratio, last rating, months since promotion, training hours and potential. Names come from rules on the cluster centres.', 'K-Means (k = 4) pada fitur terstandar: masa kerja, compa-ratio, rating terakhir, bulan sejak promosi, jam pelatihan, dan potensi. Nama berasal dari aturan pada pusat cluster.'],
 };
+const SHORT = {
+  headcount: ['The number of people currently employed.', 'Jumlah orang yang saat ini bekerja.'],
+  net: ['How much the team grew or shrank: people who joined minus people who left.', 'Seberapa besar tim bertambah atau berkurang: yang masuk dikurangi yang keluar.'],
+  turnover: ['The share of employees who left over the period. Lower is usually better.', 'Porsi karyawan yang keluar dalam periode. Umumnya makin rendah makin baik.'],
+  voluntary: ['People who chose to resign, as a share of all employees.', 'Karyawan yang memilih resign, sebagai porsi dari seluruh karyawan.'],
+  regretted: ['Resignations of people who were rated 4 or 5 in their last review, the people the company most wanted to keep.', 'Resign dari karyawan yang berating 4 atau 5 pada penilaian terakhir, yang paling ingin dipertahankan perusahaan.'],
+  early: ['Of everyone who left, the share who left within their first year. It often points to problems in hiring or onboarding.', 'Dari semua yang keluar, porsi yang pergi di tahun pertama. Sering menandakan masalah rekrutmen atau onboarding.'],
+  revEmp: ['Sales (revenue) divided by the number of employees: how much business each person brings in.', 'Penjualan (revenue) dibagi jumlah karyawan: seberapa besar bisnis yang dihasilkan tiap orang.'],
+  ebitdaEmp: ['Operating profit divided by the number of employees. EBITDA means profit before interest, tax and depreciation.', 'Laba operasional dibagi jumlah karyawan. EBITDA berarti laba sebelum bunga, pajak, dan penyusutan.'],
+  tonFte: ['Tonnes of product made per employee per year. Selling prices do not affect it.', 'Ton produk per karyawan per tahun. Tidak dipengaruhi harga jual.'],
+  mcTon: ['What employees cost for each tonne produced.', 'Biaya karyawan untuk setiap ton yang diproduksi.'],
+  hcroi: ['For every $1 spent on employees, how many dollars of operating profit (before people cost) come back.', 'Untuk setiap $1 biaya karyawan, berapa dolar laba operasional (sebelum biaya karyawan) yang kembali.'],
+  otBase: ['Overtime pay as a percentage of base salary. High values can mean overworked teams.', 'Upah lembur sebagai persentase gaji pokok. Nilai tinggi bisa berarti tim kelelahan.'],
+  mc: ['Everything the company pays for its employees: salary, bonus, benefits, overtime, training and other costs.', 'Semua yang dibayar perusahaan untuk karyawan: gaji, bonus, tunjangan, lembur, pelatihan, dan lainnya.'],
+  mcRev: ['Out of every $100 of sales, how many dollars go to employees.', 'Dari setiap $100 penjualan, berapa dolar untuk biaya karyawan.'],
+  cpf: ['The average yearly cost of one employee, all cost types included.', 'Biaya tahunan rata-rata satu karyawan, semua jenis biaya.'],
+  mcEbitda: ['The share of operating profit that goes to employee costs.', 'Porsi laba operasional yang dipakai untuk biaya karyawan.'],
+  bridge: ['Splits the change in total people cost into two causes: having more people, and paying each person more.', 'Memecah perubahan total biaya karyawan menjadi dua penyebab: jumlah orang bertambah, dan biaya per orang naik.'],
+  budgetVar: ['How far actual spending is from the plan. Positive means more was spent than planned.', 'Seberapa jauh pengeluaran aktual dari rencana. Positif berarti melebihi rencana.'],
+  funnel: ['How many candidates remain at each step of hiring, from applying to joining.', 'Berapa kandidat yang tersisa di tiap tahap rekrutmen, dari melamar sampai bergabung.'],
+  ttf: ['How many days it takes to fill a job, from opening it to an accepted offer.', 'Berapa hari untuk mengisi satu lowongan, dari dibuka sampai penawaran diterima.'],
+  oar: ['Out of every 100 job offers made, how many candidates said yes.', 'Dari setiap 100 penawaran kerja, berapa kandidat yang menerima.'],
+  cph: ['The average total recruiting cost of hiring one person.', 'Rata-rata total biaya rekrutmen untuk satu karyawan baru.'],
+  qoh: ['A 0–100 score for how good new hires turn out: half from their first performance rating, half from whether they stayed a year.', 'Skor 0–100 untuk kualitas karyawan baru: separuh dari rating kinerja pertama, separuh dari apakah bertahan setahun.'],
+  internalFill: ['The share of jobs filled by promoting or moving someone already in the company.', 'Porsi lowongan yang diisi dari karyawan yang sudah ada.'],
+  finalRating: ['The yearly review result from 1 to 5, mixing goal results (70%) and behavior (30%).', 'Hasil penilaian tahunan 1–5, gabungan hasil target (70%) dan perilaku (30%).'],
+  whatHow: ['Sorts people by what they achieved (goals) and how they achieved it (behavior).', 'Mengelompokkan orang berdasarkan apa yang dicapai (target) dan bagaimana mencapainya (perilaku).'],
+  nineBox: ['A 3×3 grid of recent performance against potential to grow, used to decide who to develop, promote or coach.', 'Matriks 3×3 kinerja terkini dan potensi berkembang, untuk menentukan siapa yang dikembangkan, dipromosikan, atau di-coach.'],
+  goal: ['How much of their yearly targets people reached on average. 100% means fully met.', 'Rata-rata seberapa banyak target tahunan tercapai. 100% berarti tercapai penuh.'],
+  promo: ['The share of employees promoted to a higher job level in the period.', 'Porsi karyawan yang naik ke level jabatan lebih tinggi dalam periode.'],
+  trainH: ['Average hours of training per employee.', 'Rata-rata jam pelatihan per karyawan.'],
+  succession: ['For each key role, is someone ready to step in? "Ready now" means they could take over today.', 'Untuk setiap posisi kunci, apakah ada yang siap menggantikan? "Siap sekarang" berarti bisa menggantikan hari ini.'],
+  compa: ['Pay level: how someone\'s salary compares with the middle of the pay range for their job level. 100% is exactly the middle, 90% is 10% below.', 'Level gaji: gaji seseorang dibanding titik tengah rentang gaji untuk level jabatannya. 100% tepat di tengah, 90% berarti 10% di bawah.'],
+  forecast: ['A projection of the next 12 months from the pattern of the past three-plus years, including seasonal ups and downs. The shaded band is the range the model is 80% sure about.', 'Proyeksi 12 bulan ke depan dari pola lebih dari tiga tahun terakhir, termasuk naik-turun musiman. Pita arsir adalah rentang yang diyakini model 80%.'],
+  risk: ['The model\'s estimate of how likely each person is to resign in the next 12 months, from five facts about them. It is good at ranking groups, not at predicting one person.', 'Perkiraan model tentang seberapa mungkin tiap orang resign dalam 12 bulan ke depan, dari lima fakta tentang mereka. Ia baik untuk mengurutkan kelompok, bukan meramal satu orang.'],
+  auc: ['A score from 0.5 (no better than a coin flip) to 1.0 (perfect) for how well the model separates people who resigned from people who stayed.', 'Skor dari 0,5 (tak lebih baik dari tebak acak) sampai 1,0 (sempurna) untuk seberapa baik model membedakan yang resign dari yang bertahan.'],
+  segments: ['The computer grouped employees with similar profiles into four groups. The names and advice are written by us.', 'Komputer mengelompokkan karyawan berprofil mirip menjadi empat kelompok. Nama dan sarannya kami tulis sendiri.'],
+};
+DEF.auc = ['AUC: the chance that a randomly chosen person who resigned received a higher risk score than a randomly chosen person who stayed. Measured on a year the model had not seen.', 'AUC: peluang bahwa orang yang resign dipilih acak memperoleh skor risiko lebih tinggi daripada orang yang bertahan. Diukur pada tahun yang belum pernah dilihat model.'];
+const GLOSS = [
+  ['Headcount', 'Headcount', 'The number of people employed on a given date.', 'Jumlah orang yang bekerja pada tanggal tertentu.'],
+  ['Turnover and attrition', 'Turnover dan attrition', 'The share of employees who left over a period. A yearly turnover of 12% means about 12 out of every 100 employees left during the year. Attrition is another word for the same idea.', 'Porsi karyawan yang keluar dalam suatu periode. Turnover tahunan 12% berarti sekitar 12 dari setiap 100 karyawan keluar dalam setahun. Attrition adalah istilah lain untuk hal yang sama.'],
+  ['Resigned, dismissed, contract ended', 'Resign, PHK, kontrak berakhir', 'Resigned = left by their own choice. Dismissed (terminated) = the company ended the job. Contract ended = a fixed-term contract was not renewed.', 'Resign = keluar atas pilihan sendiri. PHK = perusahaan mengakhiri hubungan kerja. Kontrak berakhir = kontrak waktu tertentu tidak diperpanjang.'],
+  ['Pay level (compa-ratio)', 'Level gaji (compa-ratio)', 'How someone\'s salary compares with the middle of the pay range for their job level. 100% = exactly the middle, 90% = 10% below, 110% = 10% above.', 'Perbandingan gaji seseorang dengan titik tengah rentang gaji untuk level jabatannya. 100% = tepat di tengah, 90% = 10% di bawah, 110% = 10% di atas.'],
+  ['Job level (job band)', 'Level jabatan (job band)', 'The rank of a role: Operator, Staff, Supervisor, Manager, General Manager or Director.', 'Jenjang sebuah posisi: Operator, Staf, Supervisor, Manajer, General Manager, atau Direktur.'],
+  ['Permanent and contract (PKWTT, PKWT)', 'Tetap dan kontrak (PKWTT, PKWT)', 'Permanent = open-ended employment (PKWTT). Contract = employment for a fixed period (PKWT).', 'Tetap = hubungan kerja tanpa batas waktu (PKWTT). Kontrak = hubungan kerja untuk waktu tertentu (PKWT).'],
+  ['Revenue and operating profit (EBITDA)', 'Revenue dan laba operasional (EBITDA)', 'Revenue is total sales. Operating profit (EBITDA) is the profit from running the business, before interest, tax and depreciation.', 'Revenue adalah total penjualan. Laba operasional (EBITDA) adalah laba dari menjalankan bisnis, sebelum bunga, pajak, dan penyusutan.'],
+  ['Manpower cost (people cost)', 'Manpower cost (biaya karyawan)', 'Everything the company spends on its employees: salary, bonus, benefits, overtime, training and other costs.', 'Semua yang dikeluarkan perusahaan untuk karyawannya: gaji, bonus, tunjangan, lembur, pelatihan, dan biaya lain.'],
+  ['Full-time employees (FTE)', 'Karyawan setara penuh waktu (FTE)', 'A way of counting people by time worked. Someone employed for the whole month counts as 1; someone who joined halfway through counts as 0.5.', 'Cara menghitung orang berdasarkan waktu kerja. Karyawan yang bekerja sebulan penuh dihitung 1; yang bergabung di pertengahan bulan dihitung 0,5.'],
+  ['Maintenance shutdown (turnaround)', 'Shutdown perawatan (turnaround)', 'A planned stop of a plant for major maintenance. Output falls and overtime rises while it lasts.', 'Penghentian pabrik yang direncanakan untuk perawatan besar. Produksi turun dan lembur naik selama berlangsung.'],
+  ['Job opening (requisition)', 'Lowongan (requisition)', 'An approved request to hire someone. It is "open" until a candidate accepts the offer.', 'Permintaan resmi untuk merekrut seseorang. Statusnya "terbuka" sampai kandidat menerima penawaran.'],
+  ['Days to fill a job (time-to-fill)', 'Lama mengisi lowongan (time-to-fill)', 'Calendar days from opening a job to an accepted offer.', 'Jumlah hari kalender dari lowongan dibuka sampai penawaran diterima.'],
+  ['Goal results (KPI)', 'Hasil target (KPI)', 'A KPI is a measurable yearly target. 100% means the target was fully met.', 'KPI adalah target tahunan yang terukur. 100% berarti target tercapai penuh.'],
+  ['Behavior score', 'Skor perilaku', 'How someone works, rated 1–5 on safety mindset, integrity, collaboration, continuous improvement and customer focus.', 'Cara seseorang bekerja, dinilai 1–5 pada pola pikir keselamatan, integritas, kolaborasi, perbaikan berkelanjutan, dan fokus pelanggan.'],
+  ['Performance & potential grid (9-box)', 'Matriks kinerja & potensi (9-box)', 'A 3×3 grid placing people by recent performance and by potential to grow. It helps decide who to develop, promote or coach.', 'Matriks 3×3 yang menempatkan orang berdasarkan kinerja terkini dan potensi berkembang. Membantu memutuskan siapa yang dikembangkan, dipromosikan, atau di-coach.'],
+  ['Backup plan for key roles (succession)', 'Rencana pengganti posisi kunci (suksesi)', 'Whether each key role has someone ready to step in: now, within 1–2 years, or nobody yet.', 'Apakah setiap posisi kunci punya orang yang siap menggantikan: sekarang, dalam 1–2 tahun, atau belum ada.'],
+  ['Synthetic data', 'Data sintetis', 'Data created by a computer program. No real person or company is described.', 'Data yang dibuat oleh program komputer. Tidak ada orang atau perusahaan nyata yang digambarkan.'],
+];
 const INFO_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/></svg>';
 const info = (k) => `<button type="button" class="info" data-def="${k}" aria-label="${esc(tt('How this is calculated', 'Cara menghitung'))}">${INFO_SVG}</button>`;
 
@@ -170,9 +287,9 @@ function periodMonths(which) {
   return M.filter((m) => m.startsWith(DB.LAST_FY));
 }
 const priorMonths = (ms) => ms.map((m) => ymAdd(m, -12)).filter((m) => m >= DB.MONTHS[0]);
-const periodLabel = () => (S.period === 'ttm' ? tt('Last 12 months', '12 bulan terakhir') : S.period === 'ytd' ? 'YTD ' + DB.LAST.slice(0, 4) : 'FY' + DB.LAST_FY);
+const periodLabel = () => (S.period === 'ttm' ? tt('Last 12 months', '12 bulan terakhir') : S.period === 'ytd' ? tt(DB.LAST.slice(0, 4) + ' so far', DB.LAST.slice(0, 4) + ' sejauh ini') : tt('Full year ' + DB.LAST_FY, 'Tahun penuh ' + DB.LAST_FY));
 const vsTarget = (g) => (g >= 0 ? P(g) + tt(' above target', ' di atas target') : P(-g) + tt(' below target', ' di bawah target'));
-const periodName = () => (S.period === 'ttm' ? tt('last 12 months', '12 bulan terakhir') : S.period === 'ytd' ? tt('year to date', 'sejak awal tahun') : 'FY' + DB.LAST_FY);
+const periodName = () => (S.period === 'ttm' ? tt('last 12 months', '12 bulan terakhir') : S.period === 'ytd' ? tt('this year so far', 'tahun ini sejauh ini') : tt('full year ' + DB.LAST_FY, 'tahun penuh ' + DB.LAST_FY));
 function periodRange(ms) { ms = ms || periodMonths(); return ms.length ? (ms.length === 1 ? ymLabel(ms[0]) : ymShort(ms[0]) + ' – ' + ymShort(ms[ms.length - 1])) : ''; }
 
 // cached aggregates, rebuilt when filters change
@@ -232,7 +349,7 @@ function hero(label, valueHtml, pillHtml, sideLabel, sideVal, def) {
 const lead = (heroHtml, stats) => `<section class="lead" aria-label="${esc(tt('Key figures', 'Angka utama'))}">${heroHtml}<div class="strip fade" style="--i:1">${stats.join('')}</div></section>`;
 function sowhat(items) {
   const cols = ['var(--purple)', 'var(--orange)', 'var(--navy)'];
-  return `<section class="sowhat fade" style="--i:2" aria-label="So what"><h2>${tt('So what?', 'Jadi, apa artinya?')}</h2><div class="sw-list">${items.filter(Boolean).slice(0, 3).map((x, i) =>
+  return `<section class="sowhat fade" style="--i:2" aria-label="So what"><h2>${tt('So what?', 'Jadi, apa artinya?')}</h2><p class="sw-sub">${tt('What the numbers mean and what to do about it. Recalculated for the filters you choose.', 'Arti angka-angka ini dan apa yang perlu dilakukan. Dihitung ulang sesuai filter yang Anda pilih.')}</p><div class="sw-list">${items.filter(Boolean).slice(0, 3).map((x, i) =>
     `<div class="sw-item"><span class="dot" style="background:${cols[i]}"></span><div><p>${x[0]}</p><p class="sw-act"><b>${tt('Action', 'Aksi')}:</b> ${x[1]}</p></div></div>`).join('')}</div></section>`;
 }
 const filtersNote = (msg) => `<p class="note fade" style="--i:3">${msg}</p>`;

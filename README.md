@@ -22,6 +22,15 @@ An end-to-end people analytics product built the way it would run inside a compa
 
 Every page has a **So what?** card with two or three findings and a recommended action, computed from the data and the filters. Every metric has an ⓘ button with its formula ([docs/METRICS.md](docs/METRICS.md)). The interface is in English with a Bahasa Indonesia switch.
 
+## Written for non-experts
+
+A dashboard is only good if someone who does not work in HR can follow it. So:
+- **A "how to read this page" box** opens every page: what it shows, how to read the charts, why it matters.
+- **Plain words, not jargon.** "Compa-ratio" is shown as *pay level* (100% = the middle of the pay range), "FTE" as *employees*, "requisition" as *job opening*, "turnaround" as *maintenance shutdown*, and so on. A word list in  swaps specialist terms in every sentence, in English and Bahasa Indonesia, and an automated test fails if a banned term appears on screen.
+- **Each ⓘ tooltip explains first, then gives the formula.**
+- **A glossary** in the sidebar defines 17 terms.
+- **The employee-group (segmentation) section** explains what was done, lists the six facts used, labels each group with computed traits (for example "Most likely to resign"), and says how to read the dot chart.
+
 ## Methodology in brief
 
 **Data** ([generator/generate.py](generator/generate.py), [docs/DATA.md](docs/DATA.md)). A month-by-month simulation from January 2023 to today, written in standard-library Python.

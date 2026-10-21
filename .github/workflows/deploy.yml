@@ -1,0 +1,65 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate synthetic data (as of today, Jakarta time)
+        run: python3 generator/generate.py --as-of "$(TZ=Asia/Jakarta date +%F)"
+
+      - name: Train the three illustrative models
+        run: python3 models/train.py
+
+      - name: Validate data and scan for forbidden terms
+        run: |
+          set +e
+          python3 generator/validate.py
+          code=$?
+          set -e
+          if [ "$code" = "2" ]; then echo "::error::Forbidden-term scan failed, deployment stopped"; exit 1; fi
+          if [ "$code" = "1" ]; then echo "::warning::A data range check failed, see docs/VALIDATION.md"; fi
+
+      - name: Fill in the public URLs
+        run: |
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          REPO="${GITHUB_REPOSITORY##*/}"
+          if [ "$REPO" = "$OWNER.github.io" ]; then SITE="https://$OWNER.github.io/"; else SITE="https://$OWNER.github.io/$REPO/"; fi
+          sed -i "s#__SITE_URL__#$SITE#g; s#__REPO_URL__#https://github.com/$GITHUB_REPOSITORY#g" site/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
